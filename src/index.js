@@ -1,5 +1,7 @@
 import Hapi from 'hapi';
 import nunjucks from 'nunjucks';
+import HelloController from './hello-controller';
+import Application from './lib';
 
 // Configure nunjucks to read from the dist directory
 nunjucks.configure('./dist');
@@ -11,38 +13,19 @@ server.connection({
 	port:8000
 });
 
-// Add a route
-server.route({
-	method:'GET',
-	path:'/hello/{name*}',
-	handler: function(request,reply){
-		// Read template and compile using context object
-		nunjucks.render('index.html', getName(request), function(err,html){
-			// Reply with HTML response
-			reply(html);
+const application = new Application({
+	'/hello/{name*}': HelloController
+},{
+	server:server,
+	document: function(application,controller,request,reply,body,callback){
+		nunjucks.render('./index.html', {body:body}, (err,html) => {
+			if(err){
+				return callback(err,null);
+			}
+			callback(null,html);
 		});
 	}
 });
 
-function getName(request){
-	// Default values
-	let name = {
-		fname: 'Nandor',
-		lname: 'Persanyi'
-	}
 
-	// Split path params
-	let nameParts = request.params.name ? request.params.name.split('/') : [];
-
-	// Order of precedence
-	// 1. path param
-	// 2. query param
-	// 3. default value
-	name.fname = (nameParts[0] || request.query.fname) || name.fname;
-	name.lname = (nameParts[1] || request.query.lname) || name.lname;
-
-	return name;
-}
-
-// Start the server
-server.start();
+application.start()
