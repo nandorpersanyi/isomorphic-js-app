@@ -4,7 +4,7 @@ import HelloController from './hello-controller';
 import Application from './lib';
 
 // Configure nunjucks to read from the dist directory
-nunjucks.configure('./dist');
+nunjucks.configure('./dist',{ autoescape: false });
 
 // Create a server with a host and port
 const server = new Hapi.Server();
@@ -39,7 +39,7 @@ server.register(require('inert'), (err) => {
 			reply.file('dist/build/application.js');
 		}
 	});
-})
+});
 
 
 application.start();

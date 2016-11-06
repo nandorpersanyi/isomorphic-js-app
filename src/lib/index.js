@@ -28,8 +28,7 @@ export default class Application{
 						if(err){
 							return reply(err);
 						}
-
-						this.document(this,controller,request,reply,html,function(err,html){
+						this.document(this,controller,request,reply,html,(err,html) => {
 							if(err){
 								return reply(err);
 							}
